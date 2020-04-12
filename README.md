@@ -26,6 +26,9 @@ I want to know what I've been doing. A habit tracker of sorts, that does not get
   - Tap / Enter topic & Thoughts
   - Enter thoughts
 
+### Where did I leave off
+I want to know at what point in a chapter, project, (sub)task, I left off and what I might be doing next. Not sure whether this ought to be a integrated into each event, have a separate type of event, or have a separate type of **thing** that will allow this (e.g. I may not care where I leave off meditating (*thought I suppose I may*) where as with a book, project, etc. I may want to check what the last thing I did exactly was so I know where to start again, but also can check progress).
+
 ## Additional Thoughts
 - Group topics by ambition
   - e.g. Web App Project
