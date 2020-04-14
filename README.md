@@ -7,6 +7,9 @@ I want to know what I've been doing. A habit tracker of sorts, that does not get
 ### Single User Philosophy
 I know we live in the age of sharing, transparency, and lack of privacy. However, I want to incentive against habits, goals, ambitions, as status.
 
+### Things Must have Notes or Events
+Rather than adding something you want to do. Things will only be added at the creation of a new event or note for a new thing.
+
 ### Basics
 -  **Things** that you are doing
 - **Noting** if and when things are done
