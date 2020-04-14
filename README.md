@@ -4,6 +4,9 @@ An app/service for remembering what you've done, tracking what you're doing, and
 ## Philosophy
 I want to know what I've been doing. A habit tracker of sorts, that does not get in the way or obligate me to add an extra inconvenience to the set up / tear down involved in my activities. Ease of access, with all the details necessary, and none unnecessary.
 
+### Single User Philosophy
+I know we live in the age of sharing, transparency, and lack of privacy. However, I want to incentive against habits, goals, ambitions, as status.
+
 ### Basics
 -  **Things** that you are doing
 - **Noting** if and when things are done
