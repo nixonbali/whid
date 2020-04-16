@@ -23,10 +23,10 @@ class Things(Base, WHIDBase):
         Creates New Thing if First Occurrence of Thing
         Returns Thing by Name
         """
-        ## great spot for walrus operator python3.
+        ## great spot for walrus operator python3.8
         thing = session.query(cls).filter_by(name=name).first()
         if thing:
-            return thing[0]
+            return thing
         newThing = cls(name=name, defaultplace=defaultplace, defaultduration=defaultduration)
         session.add(newThing)
         session.commit()
@@ -52,8 +52,6 @@ class Events(Base, WHIDBase):
     __tablename__ = 'events'
     id = Column(Integer, primary_key=True)
     thing_id = Column(Integer, ForeignKey('things.id'), nullable=False)
-    # note: want to be able to create new thing
-    # if thing does not exist at time of event creation
     starttime = Column(DateTime)
     endtime = Column(DateTime)
     place = Column(String(255))
@@ -61,12 +59,13 @@ class Events(Base, WHIDBase):
 
     @classmethod
     def newEvent(cls, session, thing_name, starttime=None, endtime=None, place=None):
+                    # usual=False, now=False):
         """
         Commit New Event
         + Commit New Thing if Necessary
         """
         duration = endtime - starttime if (starttime and endtime) else None
-        thing = Things.getThing(session, name, defaultplace=place, defaultduration=duration)
+        thing = Things.getThing(session, name=thing_name, defaultplace=place, defaultduration=duration)
         event = cls(thing_id=thing.id, starttime=starttime,
                     endtime=endtime, place=place)
         session.add(event)
