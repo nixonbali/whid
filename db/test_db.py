@@ -1,17 +1,29 @@
 import unittest
-from db.declarative import *
+from db.models import *
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("postgres://localhost/whid.v0")
-Session = sessionmaker(bind=engine)
-s = Session()
-#
-class TestObjectsCRUD(unittest.TestCase):
-    """Tests CRUD for SQLAlchemy Base Objects w/ Postgres Table """
+def setUpModule():
+    """Create Session"""
+    engine = build_db("postgresql://localhost/test-whid.v0", reset = True)
+    Session = sessionmaker(bind=engine)
+    global s
+    s = Session()
+    ## initialize objects?
+    ## empty db?
 
-    def test_create_read_thing(self):
+def tearDownModule():
+    s.close()
+    ## empty db?
+
+class TestThingsCRUD(unittest.TestCase):
+    """
+    Tests CRUD for SQLAlchemy Base Objects w/ Postgres Table
+    Order of Tests Matter (C->U->D)
+    """
+
+    def test0_create_read_thing(self):
         """Tests Writing + Reading Thing to/from DB"""
         thing = Things(name="WHID Project",
                         defaultplace="Home Desk",
@@ -21,19 +33,22 @@ class TestObjectsCRUD(unittest.TestCase):
         things = s.query(Things).all()
         assert thing in things
 
-    def test_update_read_thing(self):
+    def test1_update_read_thing(self):
         """Tests Updating + Reading Thing to/from DB"""
         thing = s.query(Things).first()
         thing.defaultplace = "Bedroom Desk"
         s.commit()
         assert s.query(Things).get(thing.id).defaultplace == "Bedroom Desk"
 
-    def test_delete_read_thing(self):
+    def test2_delete_read_thing(self):
         """Tests Deleting From DB"""
         thing = s.query(Things).first()
         s.delete(thing)
         s.commit()
         assert thing not in s.query(Things).all()
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
