@@ -1,13 +1,13 @@
 import unittest
 from datetime import datetime, timedelta
 from db.models import *
-from db.db import build_db
+from db.db import create_session
 
 
 def setUpModule():
     """Create Session with Empty DB"""
     global session
-    session = build_db("postgresql://localhost/test-whid.v0", reset = True)
+    session = create_session("postgresql://localhost/test-whid.v0", reset = True)
     ## initialize objects?
     ## empty db?
 

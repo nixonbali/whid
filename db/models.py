@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from db.db import Base
 
-
 class WHIDBase():
     def __repr__(self):
         return "\n".join([f"{key}: {value}" for key, value in vars(self).items()][1:])
@@ -117,3 +116,7 @@ class NoteThings(Base, WHIDBase):
         note_thing = cls(note_id=note_id, thing_id=thing_id)
         session.add(note_thing)
         session.commit()
+
+if __name__ == "__main__":
+    from db.db import create_session, app_engine_url
+    create_session(app_engine_url, True)
