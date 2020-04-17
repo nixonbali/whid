@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Interval, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -44,6 +45,33 @@ class Notes(Base, WHIDBase):
     content = Column(Text)
     things = relationship('Things', secondary = 'note_things')
 
+    @classmethod
+    def newNote(cls, session, thing_names=[], thing_ids=[], content=None):
+        """
+        Commit New Note
+        + If tied to event - thing_id provided
+        + Else: thing_name(s) provided -> Create New Thing(s) if Necessary
+
+        NoteTime Always Now
+        """
+        note = cls(notetime=datetime.now(), content=content)
+        session.add(note)
+        session.commit()
+        ###
+        # Handle Things
+        ###
+        ## Check for names
+        if thing_names:
+            thing_ids = [Things.getThing(session, name=thing_name).id \
+                        for thing_name in thing_names]
+        ### Create NoteThings
+        for thing_id in thing_ids:
+            NoteThings.newNoteThing(session, note_id=note.id, thing_id=thing_id)
+        ### is there need to grab things from db into note?
+        return note
+
+
+
 class Events(Base, WHIDBase):
     """
     Events of Things Being Done
@@ -72,11 +100,21 @@ class Events(Base, WHIDBase):
         session.commit()
         return event
 
+    def newNote(self, content):
+        """Commit New Note Tied to Event"""
+        pass
+
 class NoteThings(Base, WHIDBase):
     """Many-to-Many Notes - Things Relationships"""
     __tablename__ = 'note_things'
     note_id = Column(Integer, ForeignKey('notes.id'), primary_key = True)
     thing_id = Column(Integer, ForeignKey('things.id'), primary_key = True)
+
+    @classmethod
+    def newNoteThing(cls, session, note_id, thing_id):
+        note_thing = cls(note_id=note_id, thing_id=thing_id)
+        session.add(note_thing)
+        session.commit()
 
 
 def build_db(engine_url, reset=False):

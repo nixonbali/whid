@@ -8,14 +8,14 @@ def setUpModule():
     """Create Session with Empty DB"""
     engine = build_db("postgresql://localhost/test-whid.v0", reset = True)
     Session = sessionmaker(bind=engine)
-    global s
-    s = Session()
+    global session
+    session = Session()
     ## initialize objects?
     ## empty db?
 
 def tearDownModule():
     """Close Session"""
-    s.close()
+    session.close()
     ## empty db?
 
 class Helpers:
@@ -24,8 +24,8 @@ class Helpers:
         thing = Things(name="WHID Project",
                         defaultplace="Home Desk",
                         defaultduration=timedelta(hours=1))
-        s.add(thing)
-        s.commit()
+        session.add(thing)
+        session.commit()
         return thing
 
 class TestThingsCRUD(unittest.TestCase):
@@ -37,22 +37,22 @@ class TestThingsCRUD(unittest.TestCase):
     def test0_create_read_thing(self):
         """Tests Writing + Reading Thing to/from DB"""
         thing = Helpers.create_commit_sample_thing()
-        things = s.query(Things).all()
+        things = session.query(Things).all()
         assert thing in things
 
     def test1_update_read_thing(self):
         """Tests Updating + Reading Thing to/from DB"""
-        thing = s.query(Things).first()
+        thing = session.query(Things).first()
         thing.defaultplace = "Bedroom Desk"
-        s.commit()
-        assert s.query(Things).get(thing.id).defaultplace == "Bedroom Desk"
+        session.commit()
+        assert session.query(Things).get(thing.id).defaultplace == "Bedroom Desk"
 
     def test2_delete_read_thing(self):
         """Tests Deleting From DB"""
-        thing = s.query(Things).first()
-        s.delete(thing)
-        s.commit()
-        assert thing not in s.query(Things).all()
+        thing = session.query(Things).first()
+        session.delete(thing)
+        session.commit()
+        assert thing not in session.query(Things).all()
 
 class TestObjectMethods(unittest.TestCase):
     """User Stories"""
@@ -61,40 +61,73 @@ class TestObjectMethods(unittest.TestCase):
     def setUpClass(cls):
         """Initialize Thing in DB"""
         thing = Helpers.create_commit_sample_thing()
+        ## Thing created: 'WHID Project'
 
     def test_getThing(self):
         """Tests Things.getThing method"""
         ## Existing Thing
-        pre_get_count = s.query(Things).count()
-        thing = Things.getThing(s, name="WHID Project", defaultplace=None, defaultduration=None)
-        assert s.query(Things).count() == pre_get_count
+        pre_get_count = session.query(Things).count()
+        thing = Things.getThing(session, name="WHID Project", defaultplace=None, defaultduration=None)
+        assert session.query(Things).count() == pre_get_count
         ## New Thing
-        newthing = Things.getThing(s, name="Meditation", defaultplace="Bedroom Chair", defaultduration=None)
-        assert s.query(Things).count() == pre_get_count + 1
-        assert newthing in s.query(Things).all()
+        newthing = Things.getThing(session, name="Meditation", defaultplace="Bedroom Chair", defaultduration=None)
+        assert session.query(Things).count() == pre_get_count + 1
+        assert newthing in session.query(Things).all()
 
     def test_newEvent(self):
         """Tests Events.newEvent method"""
         ## Existing Thing
-        event = Events.newEvent(s, thing_name="WHID Project",
+        event = Events.newEvent(session, thing_name="WHID Project",
                                 starttime=datetime.now()-timedelta(hours=1),
                                 endtime=datetime.now(), place=None)
-        assert event in s.query(Events).all()
+        assert event in session.query(Events).all()
 
         # ADD (USUAL, NOW) FEATURE
 
         ## New Thing
         endtime = datetime.now()
-        event = Events.newEvent(s, thing_name="Strength Training",
+        event = Events.newEvent(session, thing_name="Strength Training",
                                 starttime=endtime-timedelta(hours=1),
                                 endtime=endtime, place="Home Gym")
         ### check event
-        assert event in s.query(Events).all()
+        assert event in session.query(Events).all()
         ### check thing
-        thing = s.query(Things).filter_by(name="Strength Training").first()
+        thing = session.query(Things).filter_by(name="Strength Training").first()
         assert thing is not None
         assert thing.defaultduration == timedelta(hours=1)
         assert thing.defaultplace == "Home Gym"
+
+    def test_newNote_newNoteThing(self):
+        """Tests Notes.newNote and (subsequently) NoteThings.newNoteThing methods"""
+        ## testing with note as string - could move to reading from file first
+
+        ## Single Thing Name
+        note = Notes.newNote(session, thing_names = ['WHID Project'],
+                            content = "Designing and Testing Note Model")
+        assert note in session.query(Notes).all()
+        assert len(note.things) == 1 and note.things[0].name == 'WHID Project'
+
+        ## Single Thing ID
+        note = Notes.newNote(session, thing_ids = [session.query(Things).filter_by(name="WHID Project").first().id],
+                            content = "Testing Note by Single Thing ID")
+        assert note in session.query(Notes).all()
+        assert len(note.things) == 1 and note.things[0].name == 'WHID Project'
+
+        ## Multiple Thing Names
+        note = Notes.newNote(session, thing_names = [thing.name for thing in session.query(Things).all()],
+                            content = "Testing Note by Multiple Thing Names")
+        assert note in session.query(Notes).all()
+        assert len(note.things) == session.query(Things).count()
+
+
+        ## Multiple Thing IDs
+        note = Notes.newNote(session, thing_ids = [thing.id for thing in session.query(Things).all()],
+                            content = "Testing Note by Multiple Thing IDs")
+        assert note in session.query(Notes).all()
+        assert len(note.things) == session.query(Things).count()
+
+    def test_newNoteFromEvent(self):
+        pass
 
 
 
