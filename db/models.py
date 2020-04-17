@@ -45,7 +45,8 @@ class Notes(Base, WHIDBase):
     ## How will I handle time column when updating notes?
     content = Column(Text)
     things = relationship('Things', secondary = 'note_things')
-    event = relationship('Events')
+    event = relationship('Events') # list because note event_id in Notes table
+    # each note can only have one event -> consider adding event_id col
 
     @classmethod
     def newNote(cls, session, thing_names=[], thing_ids=[], content=None):
