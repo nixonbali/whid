@@ -96,6 +96,8 @@ class TestObjectMethods(unittest.TestCase):
         assert thing is not None
         assert thing.defaultduration == timedelta(hours=1)
         assert thing.defaultplace == "Home Gym"
+        assert event in thing.events
+        assert event.thing == thing
 
     def test_newNote_newNoteThing(self):
         """Tests Notes.newNote and (subsequently) NoteThings.newNoteThing methods"""
