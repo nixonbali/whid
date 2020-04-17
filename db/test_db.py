@@ -126,9 +126,14 @@ class TestObjectMethods(unittest.TestCase):
         assert note in session.query(Notes).all()
         assert len(note.things) == session.query(Things).count()
 
-    def test_newNoteFromEvent(self):
-        pass
-
+    def test_newNote__fromEvent(self):
+        event = Events.newEvent(session, thing_name="WHID Project",
+                                starttime=datetime.now()-timedelta(hours=1),
+                                endtime=datetime.now(), place=None)
+        event.newNote(session, content="Testing Event Notes")
+        note = session.query(Notes).get(event.note_id)
+        assert note.event[0] == event
+        assert len(note.things) == 1 and note.things[0] == event.thing
 
 
 

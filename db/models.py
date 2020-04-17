@@ -17,6 +17,7 @@ class Things(Base, WHIDBase):
     defaultplace = Column(String(255))
     defaultduration = Column(Interval)
     notes = relationship('Notes', secondary = 'note_things')
+    events = relationship('Events')
 
     @classmethod
     def getThing(cls, session, name, defaultplace=None, defaultduration=None):
@@ -44,6 +45,7 @@ class Notes(Base, WHIDBase):
     ## How will I handle time column when updating notes?
     content = Column(Text)
     things = relationship('Things', secondary = 'note_things')
+    event = relationship('Events')
 
     @classmethod
     def newNote(cls, session, thing_names=[], thing_ids=[], content=None):
@@ -57,9 +59,6 @@ class Notes(Base, WHIDBase):
         note = cls(notetime=datetime.now(), content=content)
         session.add(note)
         session.commit()
-        ###
-        # Handle Things
-        ###
         ## Check for names
         if thing_names:
             thing_ids = [Things.getThing(session, name=thing_name).id \
@@ -67,7 +66,6 @@ class Notes(Base, WHIDBase):
         ### Create NoteThings
         for thing_id in thing_ids:
             NoteThings.newNoteThing(session, note_id=note.id, thing_id=thing_id)
-        ### is there need to grab things from db into note?
         return note
 
 
@@ -84,6 +82,7 @@ class Events(Base, WHIDBase):
     endtime = Column(DateTime)
     place = Column(String(255))
     note_id = Column(Integer, ForeignKey('notes.id'))
+    thing = relationship('Things')
 
     @classmethod
     def newEvent(cls, session, thing_name, starttime=None, endtime=None, place=None):
@@ -100,9 +99,12 @@ class Events(Base, WHIDBase):
         session.commit()
         return event
 
-    def newNote(self, content):
+    def newNote(self, session, content):
         """Commit New Note Tied to Event"""
-        pass
+        note = Notes.newNote(session, thing_ids = [self.thing_id], content=content)
+        self.note_id = note.id
+        session.commit()
+
 
 class NoteThings(Base, WHIDBase):
     """Many-to-Many Notes - Things Relationships"""
