@@ -1,15 +1,13 @@
 import unittest
-from db.models import *
 from datetime import datetime, timedelta
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from db.models import *
+from db.db import build_db
+
 
 def setUpModule():
     """Create Session with Empty DB"""
-    engine = build_db("postgresql://localhost/test-whid.v0", reset = True)
-    Session = sessionmaker(bind=engine)
     global session
-    session = Session()
+    session = build_db("postgresql://localhost/test-whid.v0", reset = True)
     ## initialize objects?
     ## empty db?
 

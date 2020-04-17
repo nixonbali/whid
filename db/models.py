@@ -1,9 +1,8 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Interval, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from db.db import Base
 
-Base = declarative_base()
 
 class WHIDBase():
     def __repr__(self):
@@ -118,19 +117,3 @@ class NoteThings(Base, WHIDBase):
         note_thing = cls(note_id=note_id, thing_id=thing_id)
         session.add(note_thing)
         session.commit()
-
-
-def build_db(engine_url, reset=False):
-    from sqlalchemy import create_engine
-    from sqlalchemy_utils import database_exists, create_database
-    engine = create_engine(engine_url)
-    if not database_exists(engine.url):
-        create_database(engine.url)
-    if reset:
-        Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    return engine
-
-
-if __name__ == "__main__":
-    build_db("postgresql://localhost/whid.v0")
