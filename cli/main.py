@@ -39,16 +39,36 @@ def invalid_input(*args):
 
 def new_event(*args):
     """New Event Input"""
-    print('creating new event')
+    #Events.newEvent(cls, session, thing_name, starttime=None, endtime=None, place=None)
+    #Events.newNote(self, session, content)
+
+    # Most Basic Input: Just Thing Name
+    # Next Level: Duration and/or Place
+    # Next Level: Update Default Duration and/or Place
+
+    print('creating new event\n')
+    event = Events.newEvent(session, thing_name=args[0]) #ugly, use kwargs?
+    print(event.thing.name, event.id)
+    print('\n')
+
+
+
 
 def new_note(*args):
     """New Note Input"""
+    #Notes.newNote(cls, session, thing_names=[], thing_ids=[], content=None)
     print('creating new note')
 
 def list_things(*args):
     """Lists Things"""
     print("Things You're Doing:\n")
     print("\n".join(thing.name for thing in session.query(Things).all()))
+
+"""
+Other Functions
+
+List Events/Notes By Thing
+"""
 
 
 from collections import defaultdict
