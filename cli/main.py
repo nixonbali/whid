@@ -1,5 +1,4 @@
 import sys
-from db.db import Session
 from db.models import Things, Events, Notes
 
 """
@@ -21,6 +20,18 @@ note [thing_names]
 -> upon save/exit -> triggers Note.newNote(session, thing_names=[thing_names], content=read(note.txt)
 """
 
+"""
+Development Mode: Use Test DB
+"""
+development = True
+if development:
+    from db.db import create_session
+    engine, Session = create_session("postgresql://localhost/test-whid.v0")
+else:
+    from db.db import Session
+session = Session()
+
+
 def invalid_input(*args):
     """Handles Invalid Input Argument"""
     print(f"Invalid Action: {sys.argv[1]}")
@@ -34,13 +45,20 @@ def new_note(*args):
     """New Note Input"""
     print('creating new note')
 
+def list_things(*args):
+    """Lists Things"""
+    print("Things You're Doing:\n")
+    print("\n".join(thing.name for thing in session.query(Things).all()))
+
+
 from collections import defaultdict
 switcher = defaultdict(lambda: invalid_input)
 switcher['event'] = new_event
 switcher['note'] = new_note
+switcher['things'] = list_things
 
 if __name__ == "__main__":
-    print('whid called')
+    print('whid called\n')
     try:
         switcher[sys.argv[1]](*sys.argv[2:])
     except IndexError:
