@@ -25,7 +25,7 @@ class Helpers:
         session.commit()
         return thing
 
-class TestThingsCRUD(unittest.TestCase):
+class Test_0_ThingsCRUD(unittest.TestCase):
     """
     Tests CRUD for SQLAlchemy Base Objects w/ Postgres Table
     Order of Tests Matter (C->U->D)
@@ -51,7 +51,7 @@ class TestThingsCRUD(unittest.TestCase):
         session.commit()
         assert thing not in session.query(Things).all()
 
-class TestObjectMethods(unittest.TestCase):
+class Test_1_ObjectMethods(unittest.TestCase):
     """User Stories"""
 
     @classmethod
