@@ -1,7 +1,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Interval, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-from db.db import Base
+
+Base = declarative_base()
 
 class WHIDBase():
     def __repr__(self):
@@ -117,6 +119,12 @@ class NoteThings(Base, WHIDBase):
         session.add(note_thing)
         session.commit()
 
+def reset_tables(engine):
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
 if __name__ == "__main__":
-    from db.db import create_session, app_engine_url
-    create_session(app_engine_url, True)
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "reset":
+        from db import engine, Session
+        reset_tables(engine)

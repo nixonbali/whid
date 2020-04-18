@@ -6,15 +6,14 @@ from db.db import create_session
 
 def setUpModule():
     """Create Session with Empty DB"""
+    engine, Session = create_session("postgresql://localhost/test-whid.v0")
+    reset_tables(engine)
     global session
-    session = create_session("postgresql://localhost/test-whid.v0", reset = True)
-    ## initialize objects?
-    ## empty db?
+    session = Session()
 
 def tearDownModule():
     """Close Session"""
     session.close()
-    ## empty db?
 
 class Helpers:
     @staticmethod
