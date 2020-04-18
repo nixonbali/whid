@@ -3,8 +3,10 @@ An app/service for remembering what you've done, tracking what you're doing, and
 
 ## v0
 A Habit (Notes + Events) Tracking CLI
-- `python3 -m whid event [thing_name]` - creates new event (and new thing if thing_name does not exist yet)
-- `python3 -m whid things` - lists things you have done
+
+**From whid directory:**
+- `python3 -m cli.main event [thing_name]` - creates new event (and new thing if thing_name does not exist yet)
+- `python3 -m cli.main things` - lists things you have done
 
 ## Philosophy
 I want to know what I've been doing. A habit tracker of sorts, that does not get in the way or obligate me to add an extra inconvenience to the set up / tear down involved in my activities. Ease of access, with all the details necessary, and none unnecessary.
