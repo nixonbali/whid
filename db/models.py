@@ -94,6 +94,8 @@ class Events(Base, WHIDBase):
         """
         duration = endtime - starttime if (starttime and endtime) else None
         thing = Things.getThing(session, name=thing_name, defaultplace=place, defaultduration=duration)
+        starttime = datetime.now() if starttime == None else starttime
+        endtime = datetime.now() if endtime == None else endtime
         event = cls(thing_id=thing.id, starttime=starttime,
                     endtime=endtime, place=place)
         session.add(event)

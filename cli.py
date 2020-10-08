@@ -1,5 +1,6 @@
 import sys
 from db.models import Things, Events, Notes
+from datetime import datetime, timedelta
 
 """
 v0 run w/: $ python3 -m cli.main [args]
@@ -24,11 +25,11 @@ note [thing_names]
 Development Mode: Use Test DB
 """
 development = True
-if development:
-    from db.db import create_session
-    engine, Session = create_session("postgresql://localhost/test-whid.v0")
-else:
-    from db.db import Session
+# if development:
+#     from db.db import create_session
+#     engine, Session = create_session("postgresql://localhost/test-whid.v0")
+# else:
+from db.db import Session
 session = Session()
 
 
@@ -61,8 +62,17 @@ def new_note(*args):
 
 def list_things(*args):
     """Lists Things"""
+    dayrange = args['dayrange'] if 'dayrange' in args else 14
     print("Things You're Doing:\n")
-    print("\n".join(thing.name for thing in session.query(Things).all()))
+    today = datetime.today().date()
+    daterange = [today - timedelta(days=i) for i in range(dayrange, -1, -1)]
+    for thing in session.query(Things).all():
+        line = thing.name
+        event_dates = set(event.starttime.date() for event in session.query(Events.starttime).filter(Events.thing_id == thing.id).all() if event.starttime != None)
+        line += "\t" + " ".join(["X" if day in event_dates else "_" for day in daterange])
+        # " " if 
+        print(line)
+    # print("\n".join(thing.name for thing in session.query(Things).all()))
 
 """
 Other Functions
