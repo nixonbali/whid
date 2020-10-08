@@ -68,9 +68,9 @@ def list_things(*args):
     today = datetime.today().date()
     daterange = [today - timedelta(days=i) for i in range(dayrange, -1, -1)]
     for thing in session.query(Things).all():
-        line = thing.name
+        line = thing.name + " "*(20 - len(thing.name))
         event_dates = set(event.starttime.date() for event in session.query(Events.starttime).filter(Events.thing_id == thing.id).all() if event.starttime != None)
-        line += "\t" + " ".join(["X" if day in event_dates else "_" for day in daterange])
+        line += " ".join(["X" if day in event_dates else "_" for day in daterange])
         # " " if 
         print(line)
     # print("\n".join(thing.name for thing in session.query(Things).all()))
